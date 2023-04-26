@@ -1,5 +1,6 @@
 import { ioc } from 'lite-ts-ioc';
 import { RpcBase } from 'lite-ts-rpc';
+import { NowTimeBase } from 'lite-ts-time';
 
 import { IUserService } from './i-service';
 import { UserValue } from './value';
@@ -27,7 +28,9 @@ export class UserService implements IUserService {
     }
 
     public constructor(
+        private m_NowTime: NowTimeBase,
         private m_Rpc: RpcBase,
+        private m_NowValueType: number,
         private m_ModuleBuildFunc: { [key: string]: (userService: IUserService) => any },
     ) { }
 
@@ -41,5 +44,10 @@ export class UserService implements IUserService {
         }
 
         return this.m_Module[key] as TModule;
+    }
+
+    public async getNow() {
+        const entry = await this.entry;
+        return entry.value[this.m_NowValueType] ?? await this.m_NowTime.unix();
     }
 }
